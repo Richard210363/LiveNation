@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LiveNation.WebAPI.DataProcessing;
-using LiveNation.WebAPI.Models;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace LiveNation.WebAPI.Controllers
@@ -32,7 +31,6 @@ namespace LiveNation.WebAPI.Controllers
 
             }
 
-            //return _numberRangeProcessor.ProcessNumberRange(startRange, endRange);
             return Ok(_numberRangeProcessor.ProcessNumberRange(startRange, endRange));
         }
     }
