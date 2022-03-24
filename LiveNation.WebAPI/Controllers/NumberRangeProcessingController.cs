@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LiveNation.WebAPI.DataProcessing;
+using LiveNation.WebAPI.Models;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace LiveNation.WebAPI.Controllers
@@ -10,16 +11,15 @@ namespace LiveNation.WebAPI.Controllers
     {
 
         private readonly INumberRangeProcessor _numberRangeProcessor;
-        private readonly IMemoryCache _memoryCache;
+        private IMemoryCache _memoryCache;
 
 
-        public NumberRangeProcessingController(INumberRangeProcessor numberRangeProcessor)
-        //public NumberRangeProcessingController(INumberRangeProcessor numberRangeProcessor, IMemoryCache memoryCache)
+        public NumberRangeProcessingController(INumberRangeProcessor numberRangeProcessor, IMemoryCache memoryCache)
         {
 
 
             this._numberRangeProcessor = numberRangeProcessor;
-            //this._memoryCache = memoryCache;
+            this._memoryCache = memoryCache;
         }
 
         [HttpGet]
@@ -27,11 +27,21 @@ namespace LiveNation.WebAPI.Controllers
         {
             if (endRange < startRange)
             {
-                return BadRequest(new { message = "Please make endRange larger than or equal to startRange." });
-
+                return BadRequest(new {message = "Please make endRange larger than or equal to startRange."});
             }
 
-            return Ok(_numberRangeProcessor.ProcessNumberRange(startRange, endRange));
+            string cacheKey = startRange.ToString() + "__" + endRange.ToString();
+
+            if (_memoryCache.TryGetValue(cacheKey, out NumberRangeProcessingResult numberRangeProcessingResult))
+            {
+                return Ok(numberRangeProcessingResult);
+            }
+
+            numberRangeProcessingResult = _numberRangeProcessor.ProcessNumberRange(startRange, endRange);
+
+            _memoryCache.Set(cacheKey, numberRangeProcessingResult);
+
+            return Ok(numberRangeProcessingResult);
         }
     }
 }

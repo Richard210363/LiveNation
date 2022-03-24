@@ -1,9 +1,11 @@
+using System;
 using NUnit.Framework;
 using Moq;
 using LiveNation.WebAPI.Controllers;
 using LiveNation.WebAPI.DataProcessing;
 using LiveNation.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace LiveNation.WebAPI.UnitTests
 {
@@ -42,7 +44,9 @@ namespace LiveNation.WebAPI.UnitTests
         [Test]
         public void Test_Get_ReturnsResultInCorrectFormat()
         {
-            NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object);
+            //Arrange
+            IMemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
+            NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object, memoryCache);
 
             //Act
             var objectResult = numberRangeProcessingController.Get(startRange, endRange) as OkObjectResult;
@@ -55,7 +59,9 @@ namespace LiveNation.WebAPI.UnitTests
         [Test]
         public void Test_Get_ReturnsSummaryInCorrectFormat()
         {
-            NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object);
+            //Arrange
+            IMemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
+            NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object, memoryCache);
 
             //Act
             var objectResult = numberRangeProcessingController.Get(startRange, endRange) as OkObjectResult;
@@ -66,6 +72,24 @@ namespace LiveNation.WebAPI.UnitTests
             Assert.AreEqual(objectResultValue.Summary.Nation, "2");
             Assert.AreEqual(objectResultValue.Summary.LiveNation, "3");
             Assert.AreEqual(objectResultValue.Summary.Integer, "4");
+        }
+
+        [Test]
+        public void Test_Get_Returns400OnInputValuesInWrongOrder()
+        {
+            //Arrange
+            IMemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
+            NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object, memoryCache);
+
+            int startRange = 20;
+            int endRange = 15;
+
+            //Act
+            var objectResult = numberRangeProcessingController.Get(startRange, endRange) as BadRequestObjectResult; ;
+            var objectResultStatusCode = objectResult.StatusCode;
+
+            //Assert
+            Assert.AreEqual(objectResultStatusCode, 400);
         }
     }
 }
