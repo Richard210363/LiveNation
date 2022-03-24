@@ -1,13 +1,13 @@
 namespace LiveNation.WebAPI.Models
 {
-    public struct NumberRangeProcessingResult
+    public class NumberRangeProcessingResult
     {
         public string Result { get; set; }
 
         public NumberRangeProcessingResultSummery Summary { get; set; }
     }
 
-    public struct NumberRangeProcessingResultSummery
+    public class NumberRangeProcessingResultSummery
     {
         public string Live { get; set; }
 
