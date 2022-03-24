@@ -24,18 +24,16 @@ namespace LiveNation.WebAPI.Controllers
         }
 
         [HttpGet]
-        public NumberRangeProcessingResult Get(int startRange, int endRange)
+        public IActionResult Get(int startRange, int endRange)
         {
-            if(endRange < startRange)
+            if (endRange < startRange)
             {
-                return new NumberRangeProcessingResult
-                {
-                    Result = "Please make endRange larger than or equal to startRange."
-                };
+                return BadRequest(new { message = "Please make endRange larger than or equal to startRange." });
 
             }
 
-            return _numberRangeProcessor.ProcessNumberRange(startRange, endRange);
+            //return _numberRangeProcessor.ProcessNumberRange(startRange, endRange);
+            return Ok(_numberRangeProcessor.ProcessNumberRange(startRange, endRange));
         }
     }
 }
