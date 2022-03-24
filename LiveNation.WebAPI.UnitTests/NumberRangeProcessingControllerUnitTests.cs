@@ -3,6 +3,7 @@ using Moq;
 using LiveNation.WebAPI.Controllers;
 using LiveNation.WebAPI.DataProcessing;
 using LiveNation.WebAPI.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LiveNation.WebAPI.UnitTests
 {
@@ -44,10 +45,11 @@ namespace LiveNation.WebAPI.UnitTests
             NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object);
 
             //Act
-            var returnValue = numberRangeProcessingController.Get(startRange, endRange);
-
+            var objectResult = numberRangeProcessingController.Get(startRange, endRange) as OkObjectResult;
+            var objectResultValue = objectResult.Value as NumberRangeProcessingResult;
+            
             //Assert
-            Assert.AreEqual(returnValue.Result, "Live Nation LiveNation 200");
+            Assert.AreEqual(objectResultValue.Result, "Live Nation LiveNation 200");
         }
 
         [Test]
@@ -56,13 +58,14 @@ namespace LiveNation.WebAPI.UnitTests
             NumberRangeProcessingController numberRangeProcessingController = new NumberRangeProcessingController(mockNumberRangeProcessor.Object);
 
             //Act
-            var returnValue = numberRangeProcessingController.Get(startRange, endRange);
+            var objectResult = numberRangeProcessingController.Get(startRange, endRange) as OkObjectResult;
+            var objectResultValue = objectResult.Value as NumberRangeProcessingResult;
 
             //Assert
-            Assert.AreEqual(returnValue.Summary.Live, "1");
-            Assert.AreEqual(returnValue.Summary.Nation, "2");
-            Assert.AreEqual(returnValue.Summary.LiveNation, "3");
-            Assert.AreEqual(returnValue.Summary.Integer, "4");
+            Assert.AreEqual(objectResultValue.Summary.Live, "1");
+            Assert.AreEqual(objectResultValue.Summary.Nation, "2");
+            Assert.AreEqual(objectResultValue.Summary.LiveNation, "3");
+            Assert.AreEqual(objectResultValue.Summary.Integer, "4");
         }
     }
 }
